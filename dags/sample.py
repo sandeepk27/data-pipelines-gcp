@@ -7,7 +7,7 @@ default_args = {
     'retries': 1
 }
 
-with DAG('my_github_dag',
+with DAG('test-dag',
          schedule_interval='@daily',
          catchup=False,
          default_args=default_args,
