@@ -1,0 +1,34 @@
+name: Deploy DAGs to GCP Composer
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Runs every hour (UTC)
+  workflow_dispatch:      # Allows manual trigger from GitHub Actions UI
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: tsda-456117
+
+      - name: Sync DAGs to Cloud Composer bucket
+        run: |
+          if [ -d "dags" ]; then
+            echo "📂 Found dags/ folder, syncing to GCS..."
+            gsutil -m rsync -r dags/ gs://us-central1-airflow-v1-289d3fea-bucket/dags/
+          else
+            echo "❌ ERROR: 'dags/' directory not found in repo root."
+            exit 1
+          fi
