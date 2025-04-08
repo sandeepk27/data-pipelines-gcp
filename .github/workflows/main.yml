@@ -1,0 +1,25 @@
+name: Deploy DAGs to GCP Composer
+
+
+  schedule:
+    - cron: '0 * * * *'  # Every hour on the hour (UTC)
+  workflow_dispatch:     # Optional: allows manual trigger from GitHub UI
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up gcloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Sync DAGs to Composer
+        run: |
+          gcloud config set project tsda-456117
+          gsutil -m rsync -r dags/ gs://us-central1-airflow-v1-289d3fea-bucket/dags
+
