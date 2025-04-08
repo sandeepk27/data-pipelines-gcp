@@ -1,6 +1,7 @@
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from datetime import datetime
+import logging
 
 default_args = {
     'start_date': datetime(2024, 1, 1),

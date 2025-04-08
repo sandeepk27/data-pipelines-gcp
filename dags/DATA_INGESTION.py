@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 import requests
 import configparser
+import logging
 
 # defining congiguration variables
 configparser = configparser.ConfigParser()
@@ -21,7 +22,7 @@ default_args = {
     'retry_delay': timedelta(minutes=5)
 }
 
-with DAG('test-dag',
+with DAG('spotify-dag',
          schedule_interval='@daily',
          catchup=False,
          default_args=default_args,
