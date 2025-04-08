@@ -1,0 +1,1 @@
+select count(*) from tsda-456117.RDL.SPOTIFY
