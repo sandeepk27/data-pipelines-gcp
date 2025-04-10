@@ -2,7 +2,7 @@ name: Deploy DAGs to GCP Composer
 
 on:
   schedule:
-    - cron: '0/10 * * * *'  # Runs every 10mins
+    - cron: '0 4 * * *'  # Runs every day at 4 AM
   workflow_dispatch:      # Allows manual trigger from GitHub Actions UI
 
 jobs:
