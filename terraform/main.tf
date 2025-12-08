@@ -14,6 +14,11 @@ resource "google_project_service" "bigquery_api" {
   disable_on_destroy = false
 }
 
+resource "google_project_service" "pubsub_api" {
+  service            = "pubsub.googleapis.com"
+  disable_on_destroy = false
+}
+
 // GCS Buckets
 module "dataproc_staging_bucket" {
   source      = "./modules/gcs"
@@ -65,4 +70,22 @@ module "dataproc_cluster" {
     google_project_service.dataproc_api,
     module.dataproc_staging_bucket
   ]
+}
+
+// Upload PySpark script to Dataproc Staging Bucket
+resource "google_storage_bucket_object" "pyspark_script" {
+  name   = "scripts/process_data.py"
+  source = "../dags/scripts/process_data.py"
+  bucket = module.dataproc_staging_bucket.bucket_name
+
+  depends_on = [module.dataproc_staging_bucket]
+}
+
+// Pub/Sub for Streaming
+module "pubsub_streaming" {
+  source            = "./modules/pubsub"
+  topic_name        = "streaming-data-topic"
+  subscription_name = "streaming-data-sub"
+
+  depends_on = [google_project_service.pubsub_api]
 }
