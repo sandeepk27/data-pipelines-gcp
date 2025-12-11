@@ -1,0 +1,20 @@
+config {
+  type: "view",
+  schema: "staging",
+  description: "Cleaned orders data from raw load"
+}
+
+SELECT
+  order_id,
+  user_id,
+  status,
+  gender,
+  created_at,
+  returned_at,
+  shipped_at,
+  delivered_at,
+  num_of_item
+FROM
+  ${ref("raw_daily_load")} -- Assuming this table exists from the Airflow load
+WHERE
+  created_at IS NOT NULL

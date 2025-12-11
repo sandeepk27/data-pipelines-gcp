@@ -35,3 +35,25 @@ Ensure the following Airflow Variables are set in your environment:
 - `gcp_project_id`
 - `dataflow_temp_bucket`
 - `dataproc_staging_bucket`
+- `cloudsql_public_ip` (After Terraform apply)
+
+## Architecture & Workflows
+
+### 1. Operational to Analytical Pipeline (CDC & Batch)
+This pipeline simulates an end-to-end flow from a transactional database to an analytical warehouse.
+1.  **Source**: Cloud SQL (Postgres), seeded with `thelook_ecommerce` data.
+2.  **Ingestion**: Datastream (CDC) captures changes and writes to GCS.
+3.  **Integration**: Cloud Data Fusion reads from GCS, cleans data, and loads to BigQuery (Raw).
+4.  **Modeling**: Dataform transforms raw tables into reporting views (`daily_orders`).
+5.  **Enrichment**: BigQuery Data Transfer Service brings in external Google Trends data.
+
+### 2. Real-time Intelligence Pipeline (Streaming)
+1.  **Source**: Pub/Sub receives events (simulated from `google_analytics`).
+2.  **Processing**: Cloud Dataflow (Beam) reads events, aggregates, and writes to BigQuery.
+3.  **Advanced Analytics**: Cloud Dataproc (Spark) runs a nightly job to join "Operational" data (Pipeline 1) with "Real-time" data (Pipeline 2) for complex insights.
+4.  **Orchestration**: Cloud Composer (Airflow) manages the dependencies and triggers.
+
+### Running the Integrated Demo
+1.  **Setup Infra**: `cd terraform && terraform apply`.
+2.  **Seed DB**: Trigger the `init_infra_seed` DAG in Airflow.
+3.  **Run Pipeline**: Trigger the `integrated_pipeline` DAG.
