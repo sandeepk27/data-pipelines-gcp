@@ -1,0 +1,17 @@
+config {
+  type: "table",
+  schema: "reporting",
+  description: "Daily order summary by status"
+}
+
+SELECT
+  DATE(created_at) AS order_date,
+  status,
+  COUNT(order_id) AS total_orders,
+  COUNT(DISTINCT user_id) AS unique_customers
+FROM
+  ${ref("stg_orders")}
+GROUP BY
+  1, 2
+ORDER BY
+  1 DESC
